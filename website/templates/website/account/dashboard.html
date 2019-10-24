@@ -1,0 +1,542 @@
+<!-- Estendemos do template base -->
+{% extends "website/_layouts/base.html" %}
+
+<!-- Bloco que define o <title></title> da nossa página -->
+{% block title %}Página Inicial{% endblock %}
+
+<!-- Bloco de conteúdo da nossa página -->
+{% block conteudo %}
+<!--{% if user.is_authenticated %}
+  Hi {{ user.email }}!
+  <p><a href="{% url 'logout' %}">logout</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">login</a>
+{% endif %}-->
+<div class="container mt-5">
+
+{% if not user.is_staff  or user.is_superuser %}
+  <div class="row">
+	{% if perms.authweb.change_usuario %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Atualiza Usuario</h5>
+          <p class="card-text">
+            Atualiza aqui um novo <code>Usuario</code>.
+          </p>
+          <a href="{% url 'website:atualiza_usuario' pk=user.id %}"
+             class="btn btn-primary">
+            Atualiza Usuario
+          </a>
+        </div>
+      </div>
+    </div>
+	{% endif %}
+{% if perms.authweb.view_usuario %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Usuarios</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Usuario</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_usuario' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+	{% endif %}
+ </div>
+{% endif %}
+
+{% if user.is_staff or user.is_superuser %}
+  <div class="row">
+	{% if perms.authweb.add_usuario %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Usuario</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Usuario</code>.
+          </p>
+          <a href="{% url 'website:cadastra_usuario' %}"
+             class="btn btn-primary">
+            Nova Usuario
+          </a>
+        </div>
+      </div>
+    </div>
+	{% endif %}
+	{% if perms.authweb.view_usuario %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Usuarios</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Usuario</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_usuarios' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+	{% endif %}
+  </div>
+{% endif %}
+
+
+<!--
+<div class="row">
+ {% if perms.authweb.add_foo %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Foo</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Foo</code>.
+          </p>
+          <a href="{% url 'website:cadastra_foo' %}"
+             class="btn btn-primary">
+            Nova Foo
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_foo %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Foos</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Foo</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_foos' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+-->
+
+{% if not user.is_staff  or user.is_superuser %}
+<div class="row">
+<!-- TODO reserva laboratorio-->
+
+ {% if perms.authweb.add_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Reserva Laboratorio Por Usuario</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Reserva Laboratorio</code>.
+          </p>
+          <a href="{% url 'website:cadastra_reserva_laboratorio' %}"
+             class="btn btn-primary">
+            Nova Reserva Laboratorio
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+
+{% if perms.authweb.view_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Reserva Laboratorios Por Usuario</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Reserva Laboratorio</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_reserva_laboratorios_usuario' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+{% endif %}
+{% if user.is_staff  or user.is_superuser %}
+<div class="row">
+<!-- TODO reserva laboratorio-->
+
+ {% if perms.authweb.add_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Reserva Laboratorio Geral</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Reserva Laboratorio</code>.
+          </p>
+          <a href="{% url 'website:cadastra_reserva_laboratorio_usuarios' %}"
+             class="btn btn-primary">
+            Nova Reserva Laboratorio
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+
+{% if perms.authweb.view_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Reserva Laboratorios Geral</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Reserva Laboratorio</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_reserva_laboratorios' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+{% endif %}
+
+
+<!--RESERVA PROJETOR-->
+{% if not user.is_staff  or user.is_superuser %}
+<div class="row">
+ {% if perms.authweb.add_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Reserva Projetor Por Usuario</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Reserva Projetor</code>.
+          </p>
+          <a href="{% url 'website:cadastra_reserva_projetor' %}"
+             class="btn btn-primary">
+            Nova Reserva Projetor
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Reserva Projetors Por Usuario</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Reserva Projetor</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_reserva_projetors_usuario' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+{% endif %}
+
+{% if user.is_staff  or user.is_superuser %}
+<div class="row">
+ {% if perms.authweb.add_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Reserva Projetor Geral</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Reserva Projetor</code>.
+          </p>
+          <a href="{% url 'website:cadastra_reserva_projetor_usuarios' %}"
+             class="btn btn-primary">
+            Nova Reserva Projetor
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Reserva Projetors Geral</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Reserva Projetor</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_reserva_projetors' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+{% endif %}
+
+{% if not user.is_staff  or user.is_superuser %}
+
+<div class="row">
+ {% if perms.authweb.add_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista Reserva Laboratorio Realizada</h5>
+          <p class="card-text">
+            Veja aqui a lista de Reserva<code>Laboratorio</code> realizada.
+          </p>
+          <a href="{% url 'website:lista_reserva_laboratorios_usuario' %}"
+             class="btn btn-primary">
+             Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista Reserva Laboratorio Nao Confirmada</h5>
+          <p class="card-text">
+            Veja aqui a lista de Reserva<code>Laboratorio</code> Nao Confirmada.
+          </p>
+          <a href="{% url 'website:lista_reserva_laboratorios_nao_confirmada_usuario' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+
+<div class="row">
+ {% if perms.authweb.add_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista Reserva Projetor Realizada</h5>
+          <p class="card-text">
+            Veja aqui a lista de Reserva<code>Projetor</code> realizada.
+          </p>
+          <a href="{% url 'website:lista_reserva_projetors_usuario' %}"
+             class="btn btn-primary">
+             Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_reserva %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista Reserva Projetor Nao Confirmada</h5>
+          <p class="card-text">
+            Veja aqui a lista de Reserva<code>Projetor</code> Nao Confirmada.
+          </p>
+          <a href="{% url 'website:lista_reserva_projetors_nao_confirmada_usuario' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+{% endif %}
+
+{% if user.is_staff  or user.is_superuser %}
+
+<div class="row">
+ {% if perms.authweb.add_recurso %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Laboratorio</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Laboratorio</code>.
+          </p>
+          <a href="{% url 'website:cadastra_laboratorio' %}"
+             class="btn btn-primary">
+            Nova Laboratorio
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_recurso %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Laboratorios</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Laboratorio</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_laboratorios' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+
+
+<div class="row">
+ {% if perms.authweb.add_recurso %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Projetor</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Projetor</code>.
+          </p>
+          <a href="{% url 'website:cadastra_projetor' %}"
+             class="btn btn-primary">
+            Nova Projetor
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_recurso %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Projetors</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Projetor</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_projetors' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+
+
+<div class="row">
+ {% if perms.authweb.add_tipolaboratorio %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar TipoLaboratorio</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>TipoLaboratorio</code>.
+          </p>
+          <a href="{% url 'website:cadastra_tipo_laboratorio' %}"
+             class="btn btn-primary">
+            Nova TipoLaboratorio
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_tipolaboratorio %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de TipoLaboratorios</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>TipoLaboratorio</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_tipo_laboratorios' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+
+<!-- CURSO -->
+<div class="row">
+ {% if perms.authweb.add_curso %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Curso</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Curso</code>.
+          </p>
+          <a href="{% url 'website:cadastra_curso' %}"
+             class="btn btn-primary">
+            Nova Curso
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_curso %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Cursos</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Curso</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_cursos' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+
+<!-- SITUACAO -->
+<div class="row">
+ {% if perms.authweb.add_situacao %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Situacao</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Situacao</code>.
+          </p>
+          <a href="{% url 'website:cadastra_situacao' %}"
+             class="btn btn-primary">
+            Nova Situacao
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+{% if perms.authweb.view_situacao %}
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Situacaos</h5>
+          <p class="card-text">
+            Veja aqui a lista de <code>Situacao</code> cadastrados.
+          </p>
+          <a href="{% url 'website:lista_situacaos' %}"
+             class="btn btn-primary">
+            Vá para Lista
+          </a>
+        </div>
+      </div>
+    </div>
+{% endif %}
+  </div>
+
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,424 @@
+{% load static %}
+
+{% block conteudo %}
+
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <title>Agenda de Recurso</title>
+
+
+	<!--<link rel="stylesheet" type="text/css" href="{% static 'fullcalendar/custom_agenda_recurso.css' %}" />-->
+	
+	<link rel="stylesheet" type="text/css" href="{% static 'website/css/style-adm.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'website/css/agenda.css' %}">
+	<script src="{% static 'website/js/jquery.min.js' %}"></script>
+	<script src="{% static 'website/js/moment.min.js' %}"></script>
+    
+	
+	<!--<link href="{% static 'fullcalendar/core/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/timeline/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/resource-timeline/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/daygrid/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/timegrid/main.min.css' %}" rel='stylesheet' />
+    -->
+
+	<link href="https://unpkg.com/@fullcalendar/core@4.3.1/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/timeline@4.3.0/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/resource-timeline@4.3.0/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/daygrid@4.3.0/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel='stylesheet' />
+
+	<!--<script src="{% static 'fullcalendar/core/main.min.js' %}" ></script>
+	<script src="{% static 'fullcalendar/interaction/main.min.js' %}" /></script>
+	<script src="{% static 'fullcalendar/timeline/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/resource-common/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/resource-timeline/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/daygrid/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/timegrid/main.min.js' %}"></script>
+    -->
+	
+	<script src="https://unpkg.com/@fullcalendar/core@4.3.1/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/interaction@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/timeline@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/resource-common@4.3.1/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/resource-timeline@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/daygrid@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js" ></script>
+	<!--<script src="https://unpkg.com/popper.js/dist/umd/popper.min.js" ></script>-->
+	<script src="https://unpkg.com/popper.js@1.16.0/dist/umd/popper.min.js" ></script>
+	<!--<script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js" ></script>-->
+	<script src="https://unpkg.com/tooltip.js@1.3.3/dist/umd/tooltip.min.js" ></script>
+	
+	
+	<link rel="stylesheet" type="text/css" href="{% static 'website/css/agenda.css' %}">
+	
+	
+    <!--<script src="{% static 'fullcalendar/custom_agenda_recurso.js' %}"></script>-->
+
+
+	
+	
+	</head>
+
+<body>
+	
+
+<div class="container">
+  <div id='wrap'>
+    <div id='external-events'>
+      <form  method="post">
+        <h3>Marcar consulta</h3>
+        <label>Data&emsp;/&emsp; Hora Uso</label>
+        <br/>
+        <input type="date" id="data_uso" name="data" required>
+        <input type="time" id="time_uso" name="time" min="07:00" max="23:00" required />
+        <br/>
+
+		<label>Data&emsp;/&emsp; Hora Liberacao</label>
+        <br/>
+        <input type="date" id="data_liberacao" name="data" required>
+        <input type="time" id="time_liberacao" name="time" min="07:00" max="22:00" required />
+        <br/>
+        <label>Comentario</label>
+        <br/>
+        <input type="text" id="comentario" name="comentario">
+        <br/>
+        <br/>
+        <button type="submit">Gravar</button>
+        <br/>
+        {% if messages %}
+        <span class="messages">
+        {% for message in messages %}
+            <span{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</span>
+        {% endfor %}
+        <span/>
+        {% endif %}
+       </form>
+    </div>
+    <div class="animated fadeInUp">
+    </div>
+
+    <div id='calendar'></div>
+<div id='legend'>
+<ul class="legend">
+    <li><span class="superawesome"></span> Disponivel</li>
+    <li><span class="awesome"></span> Reservado</li>
+    <li><span class="kindaawesome"></span> Indisponivel</li>
+    <li><span class="notawesome"></span> Fora de Funcionamento</li>
+</ul>
+</div>
+
+
+
+	
+
+{% block javascript %}
+		
+<script>
+	var laboratorios = [];
+	var laboratorios_hora = [ ];
+	{% if recursos|length > 0 %}
+		{% for recurso in recursos %}
+			//console.log('{{ recurso.sala }}');
+			
+			laboratorios.push({'id': '{{ recurso.id }}', 'title': '{{ recurso }}'})
+			
+			laboratorios_hora.push(
+		{
+		 id: '{{ recurso.id }}',
+		 title: '{{ recurso }}',
+		 description: 'Disponivel',
+	      startTime: '07:00', 
+		  endTime: '12:00',
+		  daysOfWeek: [1, 2, 3, 4, 5 ],
+	   });
+			laboratorios_hora.push(
+		{
+		 id: '{{ recurso.id }}',
+		 title: '{{ recurso }}',
+		 description: 'Disponivel',
+	          startTime: '13:00', 
+	    	  endTime: '17:00',
+			  daysOfWeek: [1, 2, 3, 4, 5 ],
+	   });
+
+			laboratorios_hora.push(
+		{
+		 id: '{{ recurso.id }}',
+		 title: '{{ recurso }}',
+		  description: 'Disponivel',
+	          startTime: '18:00', 
+	    	  endTime: '22:00',
+			  daysOfWeek: [ 1, 2, 3, 4, 5],
+	   });
+	
+
+		{% endfor %}
+	{% endif %}
+	//console.log(laboratorios);
+	
+
+	//console.log(laboratorios_hora);
+	
+	
+	
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltip = undefined;
+  var calendarEl = document.getElementById('calendar');
+  
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    plugins: ['interaction', 'resourceTimeline', 'timeGrid' ],
+	hiddenDays: [ 6, 0 ],
+	//editable: true,
+    selectable: true,
+
+  	locale:'pt-br',
+    defaultView: 'resourceTimelineWeek',	
+	minTime: "07:00:00",
+	maxTime: "22:00:00",
+	firstDay:1,
+	defaultDate:  moment().format("YYYY-MM-DD"),
+	selectOverlap: false,
+    header: {
+      left: 'today next',
+      center: 'title',
+      right: 'resourceTimelineWeek'
+    },
+	
+	/*eventRender: function (info) {
+	    var tooltip = new Tooltip(info.el, {
+	      title: info.event.extendedProps.description,
+		  trigger: 'hover focus',
+	      placement: 'top',
+	      container: info.el
+	    });				
+	},*/
+	/*https://stackoverflow.com/questions/10086360/change-the-color-of-a-cell-in-a-full-calendar#answer-14084532*/
+	dayRender: function (date, cell) {
+		/*console.log($(cell));*/
+		/*$(cell).addClass("disponivel");
+		$(cell).text("disponivel");*/
+		if($(date)["0"].date.getHours() == 12  | $(date)["0"].date.getHours() == 17 ){
+			console.log($(date));
+			//console.log($(date)["0"].view.props.businessHours.defs[4].ui.classNames);
+			console.log($(date)["0"].date.getHours());
+			console.log($(date)["0"].date.getMinutes());
+			console.log($(date)["0"].date.getTime());
+			
+	
+		}
+		
+		
+		
+
+	
+		
+	},
+	eventMouseEnter: function(info) {
+	  console.log(info.el);
+      tooltip = new Tooltip(info.el, {
+		  
+	      title: info.event.extendedProps.description,
+		  trigger: 'hover focus',
+	      placement: 'top',
+	      container: info.el
+	    });
+    },
+    eventMouseLeave:  function(info) {
+      if (tooltip) {
+        tooltip.dispose();
+      }
+    },
+	resourceLabelText: 'Laboratorios',
+    resources: laboratorios,
+	selectConstraint: "businessHours",
+	
+	businessHours: laboratorios_hora, /*[ // specify an array instead
+  {
+    daysOfWeek: [ 1, 2, 3,4,5, ],
+    startTime: '07:00', // 8am
+    endTime: '12:00', // 6pm
+	background: 'green',
+	title: 'disponivel'
+	//dow:  [1,2,3,4,5,],
+  },
+  {
+    daysOfWeek: [1,2,3, 4, 5 ], 
+    startTime: '13:00', // 10am
+    endTime: '17:00', // 4pm, // 6pm
+	title: 'disponivel'
+
+  },
+	{
+	daysOfWeek: [1,2,3, 4, 5 ],
+    startTime: '18:00', // 10am
+    endTime: '22:00', // 6pm
+	title: 'disponivel'
+
+  }
+],*/
+	events: [
+	/*
+	{% if reservas|length > 0 %}
+			{% for reserva in reservas %}
+			
+			
+		  {
+	        start: '{{ reserva.data_hora_saida|date:"Y-m-d" }}T{{ reserva.data_hora_saida|time:"H:i:s" }}',
+			rendering: 'background',
+	        end: '{{ reserva.data_hora_chegada|date:"Y-m-d" }}T{{ reserva.data_hora_chegada|time:"H:i:s" }}',
+			
+			resourceId: {{reserva.id_recurso.id}},
+			
+			{% ifequal reserva.situacao.id 2 %}
+			title: 'Reservado',
+			description: 'Reservado',       
+			color: 'red',
+			{% else %}  
+			title: 'Indisponivel',
+			description: 'Indisponivel',
+			color: 'orange',
+			{% endifequal %}		
+			
+	      },
+	
+	
+				{% endfor %}
+	{% endif %}
+	*/
+		
+	 	  {
+	        start: '2019-10-21T10:00:00',
+	        end: '2019-10-21T14:00:00',
+			resourceId: '1',
+			title: 'Reservado',
+			description: 'Reservado',
+	        rendering: 'background',
+			color: 'red'
+	      },
+	
+	      {
+	        title: 'Indisponivel',
+			description: 'Indisponivel',
+			start: '2019-10-21T13:00:00',
+			resourceId: '2',
+	        end: '2019-10-21T17:00:00',		
+	        rendering: 'background',
+			color: 'orange',
+	      },
+	
+	],
+
+
+		
+
+
+
+select: function(info) {
+      //alert('selected ' + info.startStr + ' to ' + info.endStr + ' on resource ' + info.resource.id);
+		/*$('#data_uso').val(info.start)
+		$('#data_liberacao').val(info.end)*/
+				
+		//https://stackoverflow.com/questions/28729634/set-values-in-input-type-date-and-time-in-javascript#answer-46191425
+		start_hour  = info.start.getHours(), // This method gets the hour 
+    	start_min   = info.start.getMinutes()
+		end_hour  = info.end.getHours(), // This method gets the hour 
+    	end_min   = info.end.getMinutes()
+		start_hour  = (start_hour  < 10 ? '0' + start_hour  : start_hour ); // It adds a 0 to number less than 10 because input[type=time] only accepts 00:00 format. 
+		start_min   = (start_min   < 10 ? '0' + start_min   : start_min  );
+		end_hour  = (end_hour  < 10 ? '0' + end_hour  : end_hour ); // It adds a 0 to number less than 10 because input[type=time] only accepts 00:00 format. 
+		end_min   = (end_min   < 10 ? '0' + end_min   : end_min  );
+		
+		document.getElementById('data_uso').valueAsDate  = info.start;
+		document.getElementById('time_uso').value  = start_hour + ":" + start_min;
+		
+		document.getElementById('data_liberacao').valueAsDate  = info.end;
+		document.getElementById('time_liberacao').value   = end_hour + ":" + end_min;
+	},
+	 
+  });
+
+  calendar.render();
+});    
+
+</script>
+
+
+<script type="text/javascript"> 
+
+	var dow_tooltip = undefined;
+	//var work_tooltip = undefined;
+	var i =0;
+	$( document ).ready( function() {
+		$().each( function(dow_tooltip){
+			i++;
+			console.log($(this));
+			$(this).attr("id", i);
+
+			console.log($("#"+i));
+			$(this).hover(
+			function() {
+				
+				dow_tooltip = new Tooltip($(this), {
+			    title: 'Disponivel',
+				trigger: 'hover focus',
+			    placement: 'top',
+			    // container: $("#"+i)
+			    });
+						
+				console.log("inside");
+			},
+			function() {
+				if (dow_tooltip) {
+	        		dow_tooltip.dispose();
+				}
+			   
+				console.log("out");
+			});
+			
+
+
+
+		});
+	});
+
+			   
+		
+    /*$( document ).ready( function() {
+	 alert("LODA DOCUMENT");
+        $("").each( function(){
+		 console.log($(this));
+			
+			$(this).css("background-color", "yellow");
+			$(this).css("background", "yellow");
+			$(this).css("color", "yellow");
+	
+                    
+
+    });
+ });
+*/
+</script>
+	
+
+{% endblock javascript %}
+
+
+
+{% endblock %}
+
+
+
+
+
+    <div style='clear:both'></div>
+
+  </div>
+</div>
+
+</body>
+
+</html>
+

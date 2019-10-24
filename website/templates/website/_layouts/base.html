@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+
+<html>
+    
+	{% load static %}
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <!-- Title -->
+        <title>{% block title %}Sistema de Auth{% endblock %}</title>
+
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="{% static 'website/img/favicon.png' %}" type="image/png">
+
+        <!-- Arquivos CSS -->
+        <link rel="stylesheet" type="text/css" href="{% static 'website/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'website/css/master.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'website/css/jquery.datetimepicker.min.css' %}" >
+
+
+        {% block styles %}{% endblock %}
+    </head>
+
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'website:index' %}">
+              <img src="{% static 'website/img/favicon.png' %}" height="45px">
+            </a>
+            <button class="navbar-toggler" type="button" 
+                data-toggle="collapse" data-target="#navbarSupportedContent" 
+                aria-controls="navbarSupportedContent" aria-expanded="false" 
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    
+					{% if user.is_authenticated %}
+					<li class="nav-item active">
+                        <a class="nav-link" href="{% url 'website:dashboard' %}">DashBoard</a>
+                    </li>					
+					
+					{% if user.is_staff %}
+					
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_usuarios' %}">Usuario</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_reserva_laboratorios' %}">Reserva Laboratorios</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_reserva_projetors' %}">Reserva Projetors</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_laboratorios' %}">Laboratorio</a>
+                    </li>
+					
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_projetors' %}">Projetor</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_tipo_laboratorios' %}">Tipo Laboratorio</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_situacaos' %}">Situacao</a>
+                    </li>
+					
+					{% else %}
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_usuario' %}">Usuario</a>
+                    </li>
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_reserva_laboratorios_usuario' %}">Reserva Laboratorios Usuario</a>
+                    </li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'website:lista_reserva_laboratorios_nao_confirmada_usuario' %}">Reserva Laboratorios Nao Confirmada Usuario</a>
+					</li>
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_reserva_projetors_usuario' %}">Reserva Projetors Usuario</a>
+                    </li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'website:lista_reserva_projetors_nao_confirmada_usuario' %}">Reserva Projetors Nao Confirmada Usuario</a>
+					</li>
+					{% endif %}
+
+
+
+
+					{% else %}
+					<li class="nav-item active">
+                        <a class="nav-link" href="{% url 'website:index' %}">Página Inicial</a>
+                    </li>					
+					{% endif %}
+					
+					
+
+
+					
+					
+
+                </ul>
+                <ul class="navbar-nav float-right">
+				{% if user.is_authenticated %}
+					    
+						<!--<li class="nav-item">
+                        	<a class="nav-link">Bem-vindo, {{ user.username }}.</a>
+                    	</li>-->
+						<li class="nav-item">
+                        	<a class="nav-link">Bem-vindo, {{ user.first_name }}. {{ user.username }}</a>
+                    	</li>
+						<li class="nav-item">
+                        	<a class="nav-link" href="{% url 'website:logout' %}">Logout</a>
+                    	</li>
+					{% else %}
+					<li class="nav-item">
+                        	<a class="nav-link">Bem-vindo Visitante, faca login.</a>
+                    </li>					    
+					{% endif %}
+                    <li class="nav-item">
+              
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Conteúdo do site -->
+        {% block conteudo %}{% endblock %}
+
+        <!-- Scripts .js -->
+        <script src="{% static 'website/js/jquery.min.js' %}"></script>
+        <script src="{% static 'website/js/bootstrap.min.js' %}"></script>
+		<script src="{% static 'website/js/jquery.datetimepicker.full.min.js' %}"></script>
+
+
+        {% block scripts %}{% endblock %}
+
+    </body>
+</html>

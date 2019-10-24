@@ -1,0 +1,86 @@
+{% extends "website/_layouts/base.html" %}
+
+{% load mytags %}
+
+{% block title %}Lista de Reserva Projetor{% endblock %}
+
+{% block conteudo %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Reserva Projetor</h5>
+
+          {% if reservas|length > 0 %}
+            <p class="card-text">
+              Aqui está a lista de <code>Reserva Projetors</code> cadastrados.
+            </p>
+
+            <table class="table">
+              <thead class="thead-dark">
+              <tr>
+               
+                <th scope="col">Numero do Projetor</th>
+				<th scope="col">Data Hora da Posse</th>
+				<th scope="col">Data Hora da Devolucao</th>
+				<th scope="col">Curso</th>
+				<th scope="col">Turno</th>
+				<th scope="col">Primeira Aula</th>
+				<th scope="col">Segunda Aula</th>
+				<th scope="col">Situacao</th>
+				<th scope="col">Confirmada</th>
+				<th scope="col" class="text-center">Ações</th>
+
+              </tr>
+              </thead>
+              <tbody>
+              {% for reserva in reservas %}
+                <tr>
+				   <td >{{ reserva.id_recurso.numero }}</td>
+				  <td scope="row">{{ reserva.data_hora_saida|date:'d/m/Y' }}-{{ reserva.data_hora_saida|time:"H:i" }}</td>
+                  <td scope="row">{{ reserva.data_hora_chegada|date:'d/m/Y' }}-{{ reserva.data_hora_chegada|time:"H:i" }}</td>
+				  <td scope="row">{{ reserva.curso.nome }}</td>
+				  <td scope="row">{{ reserva.turno }}</td>
+				  <td scope="row">{{ reserva.primeira_aula}}</td>
+				  <td scope="row">{{ reserva.segunda_aula}}</td>
+				  <td scope="row">{{ reserva.situacao.nome}}</td>
+				  <td scope="row">{{ reserva.confirmacao|str_confirmacao}}</td>
+				  	
+
+                  <td class="text-center">
+				{% if perms.authweb.change_reserva %}
+                    <a href="{% url 'website:atualiza_reserva_projetor' pk=reserva.id %}"
+                       class="btn btn-primary">
+                      Atualizar
+                    </a>
+				{% endif %}
+				{% if perms.authweb.delete_reserva %}
+                    <a href="{% url 'website:deleta_reserva_projetor' pk=reserva.id %}"
+                      class="btn btn-danger">
+                        Excluir
+                    </a>
+				{% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+        {% else %}
+          <div class="text-center mt-5 mb-5 jumbotron">
+            <h5>Nenhum <code>Reserva Projetor</code> cadastrado ainda.</h5>
+          </div>
+        {% endif %}
+          <hr />
+          <div class="text-right">
+            <a href="{% url 'website:cadastra_reserva_projetor' %}" class="btn btn-primary">
+              Cadastrar Reserva Projetor
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+© 2019 GitHub, Inc.

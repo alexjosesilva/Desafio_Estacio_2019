@@ -1,0 +1,44 @@
+<!-- Estendemos do template base -->
+{% extends "website/_layouts/base.html" %}
+
+<!-- Bloco que define o <title></title> da nossa página -->
+{% block title %}Página Inicial{% endblock %}
+
+<!-- Bloco de conteúdo da nossa página -->
+{% block conteudo %}
+<div class="container mt-5">
+
+
+<div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cadastrar Novo Usuario</h5>
+          <p class="card-text">
+            Cadastre aqui um novo <code>Usuario</code>.
+          </p>
+          <a href="{% url 'website:first_time' %}"
+             class="btn btn-primary">
+            Cadastrar Novo Usuario
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Login</h5>
+          <p class="card-text">
+            Va ao <code>Login</code>.
+          </p>
+          <a href="{% url 'website:login' %}"
+             class="btn btn-primary">
+            Login
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+
+
+<html>
+    
+	{% load static %}
+	{% load widget_tweaks %}
+ 
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <!-- Title -->
+
+        <title>{% block title %}Agenda de Recurso{% endblock %}</title>
+
+
+	<!--<link rel="stylesheet" type="text/css" href="{% static 'fullcalendar/custom_agenda_recurso.css' %}" />-->
+	     <!-- Arquivos CSS -->
+        
+		<!--<link rel="stylesheet" type="text/css" href="{% static 'website/css/jquery.datetimepicker.min.css' %}"-->
+
+	
+	<link rel="stylesheet" type="text/css" href="{% static 'website/css/style-adm.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'website/css/agenda.css' %}">
+	<script src="{% static 'website/js/jquery.min.js' %}"></script>
+	<script src="{% static 'website/js/moment.min.js' %}"></script>
+    
+	
+	<!--<link href="{% static 'fullcalendar/core/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/timeline/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/resource-timeline/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/daygrid/main.min.css' %}" rel='stylesheet' />
+	<link href="{% static 'fullcalendar/timegrid/main.min.css' %}" rel='stylesheet' />
+    -->
+
+	<link href="https://unpkg.com/@fullcalendar/core@4.3.1/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/timeline@4.3.0/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/resource-timeline@4.3.0/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/daygrid@4.3.0/main.min.css" rel='stylesheet' />
+	<link href="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.css" rel='stylesheet' />
+
+	<!--<script src="{% static 'fullcalendar/core/main.min.js' %}" ></script>
+	<script src="{% static 'fullcalendar/interaction/main.min.js' %}" /></script>
+	<script src="{% static 'fullcalendar/timeline/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/resource-common/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/resource-timeline/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/daygrid/main.min.js' %}"></script>
+	<script src="{% static 'fullcalendar/timegrid/main.min.js' %}"></script>
+    -->
+	
+	<script src="https://unpkg.com/@fullcalendar/core@4.3.1/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/interaction@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/timeline@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/resource-common@4.3.1/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/resource-timeline@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/daygrid@4.3.0/main.min.js" ></script>
+	<script src="https://unpkg.com/@fullcalendar/timegrid@4.3.0/main.min.js" ></script>
+	<!--<script src="https://unpkg.com/popper.js/dist/umd/popper.min.js" ></script>-->
+	<script src="https://unpkg.com/popper.js@1.16.0/dist/umd/popper.min.js" ></script>
+	<!--<script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js" ></script>-->
+	<script src="https://unpkg.com/tooltip.js@1.3.3/dist/umd/tooltip.min.js" ></script>
+	
+	
+        
+		<link rel="stylesheet" type="text/css" href="{% static 'website/css/bootstrap.min.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'website/css/master.css' %}">
+		<link rel="stylesheet" type="text/css" href="{% static 'website/css/agenda.css' %}">
+	<style>
+		ul li {
+       list-style: none;
+}
+
+	</style>
+	
+    <!--<script src="{% static 'fullcalendar/custom_agenda_recurso.js' %}"></script>-->
+
+
+        {% block styles %} {% endblock %}
+
+
+<script type="text/javascript"> 
+
+	$( document ).ready( function() {
+        $("tr").each( function(){
+		($("tr")).click(function(){
+				
+			if($(this).attr('data-resource-id') !== undefined){
+				var resource_id = $(this).attr('data-resource-id');
+				console.log(resource_id);
+				//$('#id_recurso').val($(this).attr('data-resource-id')).change();
+				$('#id_recurso').val(resource_id);
+				$('#id_recurso').val(resource_id).change();
+				$("#id_recurso option[data-value='" + resource_id +"']").attr("selected","selected");
+				$("#id_recurso option[data-value='" + resource_id +"']").prop("selected","selected");
+				
+			}
+		});
+		 			
+		
+		});
+    });
+	
+	
+	/*$( document ).ready( function() {
+		$().each( function(dow_tooltip){
+			i++;
+			console.log($(this));
+			$(this).attr("id", i);
+
+			console.log($("#"+i));
+			$(this).hover(
+			function() {
+				
+				dow_tooltip = new Tooltip($(this), {
+			    title: 'Disponivel',
+				trigger: 'hover focus',
+			    placement: 'top',
+			    // container: $("#"+i)
+			    });
+						
+				console.log("inside");
+			},
+			function() {
+				if (dow_tooltip) {
+	        		dow_tooltip.dispose();
+				}
+			   
+				console.log("out");
+			});
+			
+
+
+
+		});*/
+
+			   
+		
+    /*$( document ).ready( function() {
+	 alert("LODA DOCUMENT");
+        $("").each( function(){
+		 console.log($(this));
+			
+			$(this).css("background-color", "yellow");
+			$(this).css("background", "yellow");
+			$(this).css("color", "yellow");
+	
+                    
+
+    });
+ });
+*/
+</script>
+
+    </head>
+
+    <body>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="{% url 'website:index' %}">
+              <img src="{% static 'website/img/favicon.png' %}" height="45px">
+            </a>
+            <button class="navbar-toggler" type="button" 
+                data-toggle="collapse" data-target="#navbarSupportedContent" 
+                aria-controls="navbarSupportedContent" aria-expanded="false" 
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    
+					{% if user.is_authenticated %}
+					<li class="nav-item active">
+                        <a class="nav-link" href="{% url 'website:dashboard' %}">DashBoard</a>
+                    </li>					
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_usuarios' %}">Usuario</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_reserva_projetors_usuario' %}">Reserva Projetors Usuario</a>
+                    </li>
+					<li class="nav-item">
+						<a class="nav-link" href="{% url 'website:lista_reserva_projetors_nao_confirmada_usuario' %}">Reserva Projetors Nao Confirmada Usuario</a>
+					</li>
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_reserva_projetors' %}">Reserva Projetors</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_projetors' %}">Projetor</a>
+                    </li>
+
+					<li class="nav-item">
+                        <a class="nav-link" href="{% url 'website:lista_situacaos' %}">Situacao</a>
+                    </li>
+					{% else %}
+					<li class="nav-item active">
+                        <a class="nav-link" href="{% url 'website:index' %}">Página Inicial</a>
+                    </li>					
+					{% endif %}
+					
+					
+
+
+					
+					
+
+                </ul>
+                <ul class="navbar-nav float-right">
+				{% if user.is_authenticated %}
+					    
+						<li class="nav-item">
+                        	<a class="nav-link">Bem-vindo, {{ user.username }}.</a>
+                    	</li>
+						<li class="nav-item">
+                        	<a class="nav-link" href="{% url 'website:logout' %}">Logout</a>
+                    	</li>
+					{% else %}
+					<li class="nav-item">
+                        	<a class="nav-link">Bem-vindo Visitante, faca login.</a>
+                    </li>					    
+					{% endif %}
+                    <li class="nav-item">
+              
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Conteúdo do site -->
+{% block conteudo %}
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+<div class="container">
+  <div id='wrap'>
+    <div id='external-events'>
+
+
+<form method="post">
+          <h5 class="card-title">Cadastro de Reserva Projetor</h5>
+        <!--  <p class="card-text">
+            Complete o formulário abaixo para cadastrar
+            um novo <code>Reserva Projetor</code>.
+          </p>-->
+          <form method="post">
+            <!-- Não se esqueça dessa tag -->
+            {% csrf_token %}
+
+			<div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Professor</span>
+              </div>
+              {% render_field  form.id_usuario class+="form-control" %}
+            </div>
+
+
+            <!-- Nome -->
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Nome</span>
+              </div>
+              {% render_field  form.id_recurso  class+="form-control" %}
+            </div>
+
+
+				<!-- Nome -->
+            <div class="input-group mb-3">
+              <div >
+                <span class="input-group-text">Inicio</span>
+              </div>
+              {% render_field  form.data_uso class+="form-control" %}  {% render_field  form.time_uso class+="form-control" %}
+            </div>
+
+			<div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Final</span>
+              </div>
+              {% render_field  form.data_liberacao class+="form-control" %}  {% render_field  form.time_liberacao class+="form-control" %}
+            </div>
+
+			<div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Curso</span>
+              </div>
+              {% render_field  form.curso class+="form-control" %} 
+            </div>
+
+			<div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Primeira Aula</span>
+              </div>
+              {% render_field  form.primeira_aula class+="form-control" %} 
+            </div>
+
+
+			<div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Segunda Aula</span>
+              </div>
+              {% render_field  form.segunda_aula class+="form-control" %} 
+            </div>
+		
+            <hr>
+            <div class="text-right">
+              <!--<a href="{% url 'website:cadastra_reserva_projetor' %}" class="btn btn-outline-primary">Voltar</a>-->
+              <button class="btn btn-primary">Enviar</button>
+            </div>
+          </form>
+        </div>
+ <div id='calendar'>
+
+<div id='legend'>
+<ul class="legend">
+    <li><span class="superawesome"></span> Disponivel</li>
+    <li><span class="awesome"></span> Reservado</li>
+    <li><span class="kindaawesome"></span> Indisponivel</li>
+    <li><span class="notawesome"></span> Fora de Funcionamento</li>
+</ul>
+
+</div>
+
+
+
+	
+
+{% block javascript %}
+		
+<script>
+	var projetors = [];
+	var projetors_hora = [ ];
+	{% if recursos|length > 0 %}
+		{% for recurso in recursos %}
+			//console.log('{{ recurso.sala }}');
+			
+			projetors.push({'id': '{{ recurso.id }}', 'title': '{{ recurso.descricao }}'})
+			
+			projetors_hora.push(
+		{
+		 id: '{{ recurso.id }}',
+		 title: '{{ recurso.numero }}',
+		 description: 'Disponivel',
+	      startTime: '07:00', 
+		  endTime: '12:00',
+		  daysOfWeek: [1, 2, 3, 4, 5 ],
+	   });
+			projetors_hora.push(
+		{
+		 id: '{{ recurso.id }}',
+		 title: '{{ recurso.numero }}',
+		 description: 'Disponivel',
+	          startTime: '13:00', 
+	    	  endTime: '17:00',
+			  daysOfWeek: [1, 2, 3, 4, 5 ],
+	   });
+
+			projetors_hora.push(
+		{
+		 id: '{{ recurso.id }}',
+		 title: '{{ recurso.numero }}',
+		  description: 'Disponivel',
+	          startTime: '18:00', 
+	    	  endTime: '22:00',
+			  daysOfWeek: [ 1, 2, 3, 4, 5],
+	   });
+	
+
+		{% endfor %}
+	{% endif %}
+	//console.log(projetors);
+	
+
+	//console.log(projetors_hora);
+	
+	
+	
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltip = undefined;
+  var calendarEl = document.getElementById('calendar');
+  
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    plugins: ['interaction', 'resourceTimeline', 'timeGrid' ],
+	
+	hiddenDays: [ 6, 0 ],
+	//editable: true,
+	defaultView: 'resourceTimelineDay',
+    selectable: true,
+  	locale:'pt-br',	
+	minTime: "07:00:00",
+	maxTime: "22:00:00",
+	firstDay: moment().day(),
+	//scrollTime: '09:00',
+	
+	//defaultDate:  moment().format("YYYY-MM-DD"),
+	selectOverlap: false,
+    header: {
+      left: 'prev today next',
+      center: 'title',
+      right: 'resourceTimelineDay,resourceTimelineWeek'
+    },
+	resourceRender: function(info) {
+
+      var tooltip = new Tooltip(info.el, {
+        title: info.resource.title + '!!!',
+        placement: 'top',
+        trigger: 'hover',
+        container: 'body'
+      });
+    },
+	
+	/*eventRender: function (info) {
+	    var tooltip = new Tooltip(info.el, {
+	      title: info.event.extendedProps.description,
+		  trigger: 'hover focus',
+	      placement: 'top',
+	      container: info.el
+	    });				
+	},*/
+	/*https://stackoverflow.com/questions/10086360/change-the-color-of-a-cell-in-a-full-calendar#answer-14084532*/
+	dayRender: function (date, cell) {
+		/*console.log($(cell));*/
+		/*$(cell).addClass("disponivel");
+		$(cell).text("disponivel");*/
+		if($(date)["0"].date.getHours() == 12  | $(date)["0"].date.getHours() == 17 ){
+			console.log($(date));
+			//console.log($(date)["0"].view.props.businessHours.defs[4].ui.classNames);
+			console.log($(date)["0"].date.getHours());
+			console.log($(date)["0"].date.getMinutes());
+			console.log($(date)["0"].date.getTime());
+			
+	
+		}
+		
+		
+		
+
+	
+		
+	},
+	eventMouseEnter: function(info) {
+	  console.log(info.el);
+      tooltip = new Tooltip(info.el, {
+		  
+	      title: info.event.extendedProps.description,
+		  trigger: 'hover focus',
+	      placement: 'top',
+	      container: info.el
+	    });
+    },
+    eventMouseLeave:  function(info) {
+      if (tooltip) {
+        tooltip.dispose();
+      }
+    },
+	resourceLabelText: 'Projetors',
+    resources: projetors,
+	selectConstraint: "businessHours",
+	
+	businessHours: projetors_hora, /*[ // specify an array instead
+  {
+    daysOfWeek: [ 1, 2, 3,4,5, ],
+    startTime: '07:00', // 8am
+    endTime: '12:00', // 6pm
+	background: 'green',
+	title: 'disponivel'
+	//dow:  [1,2,3,4,5,],
+  },
+  {
+    daysOfWeek: [1,2,3, 4, 5 ], 
+    startTime: '13:00', // 10am
+    endTime: '17:00', // 4pm, // 6pm
+	title: 'disponivel'
+
+  },
+	{
+	daysOfWeek: [1,2,3, 4, 5 ],
+    startTime: '18:00', // 10am
+    endTime: '22:00', // 6pm
+	title: 'disponivel'
+
+  }
+],*/
+	events: [
+	
+	{% if reservas|length > 0 %}
+			{% for reserva in reservas %}
+			
+			
+		  {
+	        start: '{{ reserva.data_hora_saida|date:"Y-m-d" }}T{{ reserva.data_hora_saida|time:"H:i:s" }}',
+			rendering: 'background',
+	        end: '{{ reserva.data_hora_chegada|date:"Y-m-d" }}T{{ reserva.data_hora_chegada|time:"H:i:s" }}',
+			
+			resourceId: {{reserva.id_recurso.id}},
+			
+			{% ifequal reserva.situacao.id 2 %}
+			title: 'Reservado',
+			description: 'Reservado',       
+			color: 'red',
+			{% else %}  
+			title: 'Indisponivel',
+			description: 'Indisponivel',
+			color: 'orange',
+			{% endifequal %}		
+			
+	      },
+	
+	
+				{% endfor %}
+	{% endif %}
+	
+		
+	 	  /*{
+	        start: '2019-10-22T10:00:00',
+	        end: '2019-10-22T12:00:00',
+			resourceId: '1',
+			title: 'Reservado',
+			description: 'Reservado',
+	        rendering: 'background',
+			color: 'red'
+	      },
+	
+	      {
+	        title: 'Indisponivel',
+			description: 'Indisponivel',
+			start: '2019-10-22T13:00:00',
+			resourceId: '2',
+	        end: '2019-10-22T17:00:00',		
+	        rendering: 'background',
+			color: 'orange',
+	      },
+	*/
+	],
+	select: function(info) {
+      //alert('selected ' + info.startStr + ' to ' + info.endStr + ' on resource ' + info.resource.id);
+		/*$('#data_uso').val(info.start)
+		$('#data_liberacao').val(info.end)*/
+				
+		//https://stackoverflow.com/questions/28729634/set-values-in-input-type-date-and-time-in-javascript#answer-46191425
+		start_hour  = info.start.getHours(), // This method gets the hour 
+    	start_min   = info.start.getMinutes()
+		end_hour  = info.end.getHours(), // This method gets the hour 
+    	end_min   = info.end.getMinutes()
+		start_hour  = (start_hour  < 10 ? '0' + start_hour  : start_hour ); // It adds a 0 to number less than 10 because input[type=time] only accepts 00:00 format. 
+		start_min   = (start_min   < 10 ? '0' + start_min   : start_min  );
+		end_hour  = (end_hour  < 10 ? '0' + end_hour  : end_hour ); // It adds a 0 to number less than 10 because input[type=time] only accepts 00:00 format. 
+		end_min   = (end_min   < 10 ? '0' + end_min   : end_min  );
+		
+		document.getElementById('id_data_uso').valueAsDate  = info.start;
+		document.getElementById('id_time_uso').value  = start_hour + ":" + start_min;
+		if (end_hour == 22){
+			info.end.setDate(info.end.getDate() - 1)
+		} 
+		document.getElementById('id_data_liberacao').valueAsDate  = info.end;
+		document.getElementById('id_time_liberacao').value   = end_hour + ":" + end_min;
+	},
+	 
+  });
+
+  calendar.render();
+});    
+
+</script>
+
+
+
+	
+
+{% endblock javascript %}
+
+
+
+ </div>
+</div>
+
+{% endblock %}
+
+        <!-- Scripts .js -->
+       <script src="{% static 'website/js/jquery.min.js' %}"></script>
+		<script src="{% static 'website/js/bootstrap.min.js' %}"></script>
+		<!--<script src="{% static 'website/js/jquery.datetimepicker.full.min.js' %}"></script>-->
+		
+
+
+    </body>
+</html>

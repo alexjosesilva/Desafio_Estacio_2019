@@ -1,0 +1,75 @@
+{% extends "website/_layouts/base.html" %}
+
+{% block title %}Lista de Usuario{% endblock %}
+
+
+
+{% block conteudo %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Usuario</h5>
+
+          {% if usuarios|length > 0 %}
+            <p class="card-text">
+              Aqui está a lista de <code>Usuarios</code> cadastrados.
+            </p>
+
+            <table class="table">
+              <thead class="thead-dark">
+              <tr>
+               
+                <th scope="col">Matricula</th>
+				<th scope="col">Nome</th>
+                <th scope="col">Email</th>
+				<th scope="col">Categoria</th>
+				
+				<th scope="col" class="text-center">Ações</th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for usuario in usuarios %}
+                <tr>
+                  <th scope="row">{{ usuario.matricula }}</th>
+                  <td>{{ usuario.nome }}</td>
+				  <td>{{ usuario.email }}</td>
+ 				  <td>{{ usuario.categoria }}</td>
+
+                  <td class="text-center">
+					{% if perms.authweb.change_usuario %}
+                    <a href="{% url 'website:atualiza_usuario' pk=usuario.matricula %}"
+                       class="btn btn-primary">
+                      Atualizar
+                    </a>
+					{% endif %}
+					{% if perms.authweb.delete_usuario %}
+                    <a href="{% url 'website:deleta_usuario' pk=usuario.matricula %}"
+                      class="btn btn-danger">
+                        Excluir
+                    </a>
+					{% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+        {% else %}
+          <div class="text-center mt-5 mb-5 jumbotron">
+            <h5>Nenhum <code>Usuario</code> cadastrado ainda.</h5>
+          </div>
+        {% endif %}
+          <hr />
+          <div class="text-right">
+            <a href="{% url 'website:cadastra_usuario' %}" class="btn btn-primary">
+              Cadastrar Usuario
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+© 2019 GitHub, Inc.

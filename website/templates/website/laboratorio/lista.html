@@ -1,0 +1,76 @@
+{% extends "website/_layouts/base.html" %}
+
+{% block title %}Lista de Laboratorio{% endblock %}
+
+{% block conteudo %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Lista de Laboratorio</h5>
+
+          {% if recursos|length > 0 %}
+            <p class="card-text">
+              Aqui está a lista de <code>Laboratorios</code> cadastrados.
+            </p>
+
+            <table class="table">
+              <thead class="thead-dark">
+              <tr>
+               
+                <th scope="col">Sala</th>
+				<th scope="col">Tipo Laboratorio</th>
+				<th scope="col">Localizacao</th>
+				<th scope="col">Descricao</th>
+			    <th scope="col" class="text-center">Ações</th>
+				
+
+              </tr>
+              </thead>
+              <tbody>
+              {% for recurso in recursos %}
+                <tr>
+                  <th scope="row">{{ recurso.sala }}</th>
+				  <th scope="row">{{ recurso.tipo_laboratorio.nome}}</th>
+				  <th scope="row">{{ recurso.localizacao }}</th>
+				  <th scope="row">{{ recurso.descricao|str_none }}</th>
+			
+        
+
+                  <td class="text-center">
+				{% if perms.authweb.change_recurso %}
+                    <a href="{% url 'website:atualiza_laboratorio' pk=recurso.id %}"
+                       class="btn btn-primary">
+                      Atualizar
+                    </a>
+				{% endif %}
+				{% if perms.authweb.delete_recurso %}
+                    <a href="{% url 'website:deleta_laboratorio' pk=recurso.id %}"
+                      class="btn btn-danger">
+                        Excluir
+                    </a>
+				{% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+        {% else %}
+          <div class="text-center mt-5 mb-5 jumbotron">
+            <h5>Nenhum <code>Laboratorio</code> cadastrado ainda.</h5>
+          </div>
+        {% endif %}
+          <hr />
+          <div class="text-right">
+            <a href="{% url 'website:cadastra_laboratorio' %}" class="btn btn-primary">
+              Cadastrar Laboratorio
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+© 2019 GitHub, Inc.
