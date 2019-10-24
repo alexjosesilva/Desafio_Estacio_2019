@@ -162,4 +162,4 @@ class Reserva(models.Model):
     objetos = models.Manager()
     
     def __str__(self):
-        return str(self.id) +" | "+ str(self.data_hora_saida) + " | "+ str(self.data_hora_chegada) +" | " + str(self.situacao) +" | " + str(self.tipo_recurso)
+        return str(self.id) +" | "+ str(self.data_hora_saida) + " | "+ str(self.data_hora_chegada) +" | " + str(self.situacao.nome) +" | " + str(self.tipo_recurso)

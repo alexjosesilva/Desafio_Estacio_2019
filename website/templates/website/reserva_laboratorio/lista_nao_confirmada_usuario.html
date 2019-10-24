@@ -1,5 +1,10 @@
 {% extends "website/_layouts/base.html" %}
 
+{% load widget_tweaks %}
+
+{% load mytags %}
+
+
 {% block title %}Lista de Reserva Laboratorio{% endblock %}
 
 {% block conteudo %}
@@ -38,18 +43,20 @@
 				  <td >{{ reserva.id_recurso.tipo_laboratorio.nome }}</td>
 				  <td scope="row">{{ reserva.data_hora_saida|date:'d/m/Y' }}-{{ reserva.data_hora_saida|time:"H:i" }}</td>
                   <td scope="row">{{ reserva.data_hora_chegada|date:'d/m/Y' }}-{{ reserva.data_hora_chegada|time:"H:i" }}</td>
-				  <td scope="row">{{ reserva.justificativa }}</td>
-				  <td scope="row">{{ reserva.nome_professor}}</td>
-				  <td scope="row">{{ reserva.disciplina}}</td>
+				  <td scope="row">{{ reserva.justificativa|str_none }}</td>
+				  <td scope="row">{{ reserva.nome_professor|str_none}}</td>
+				  <td scope="row">{{ reserva.disciplina|str_none}}</td>
 				  <td scope="row">{{ reserva.situacao.nome}}</td>
 				  	
 
                   <td class="text-center">
 				{% if perms.authweb.change_reserva %}
-                    <a href="{% url 'website:atualiza_reserva_laboratorio' pk=reserva.id %}"
+					{% if not reserva.confirmacao %}
+                    <a href="{% url 'website:atualiza_reserva_laboratorio_confirma' pk=reserva.id %}"
                        class="btn btn-primary">
-                      Atualizar
+                      Confirmar?
                     </a>
+					{% endif %}
 				{% endif %}
                   </td>
                 </tr>

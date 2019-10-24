@@ -247,6 +247,8 @@ class FirstTimeView(CreateView):
                 usuario.user_permissions.add(permission)
                 permission = Permission.objects.get(codename='add_reserva')
                 usuario.user_permissions.add(permission)
+                permission = Permission.objects.get(codename='change_reserva')
+                usuario.user_permissions.add(permission)
                 
                 pass                                
             elif categoria == "laboratorista":
@@ -666,7 +668,7 @@ class ReservaLaboratorioListView(PermissionRequiredMixin,LoginRequiredMixin, Lis
     def get_context_data(self, **kwargs):
         context = super(ReservaLaboratorioListView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
-        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio", data_hora_saida__gte = datetime.now())
         
         # And so on for more models
         return context
@@ -681,7 +683,7 @@ class ReservaLaboratorioUsuarioListView(PermissionRequiredMixin,LoginRequiredMix
     def get_context_data(self, **kwargs):
         context = super(ReservaLaboratorioUsuarioListView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
-        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id, tipo_recurso="laboratorio")
+        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id, tipo_recurso="laboratorio", situacao =2, data_hora_saida__gte = datetime.now())
         
         # And so on for more models
         return context
@@ -697,7 +699,7 @@ class ReservaNaoConfirmadaLaboratorioUsuarioListView(PermissionRequiredMixin,Log
         context = super(ReservaNaoConfirmadaLaboratorioUsuarioListView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
         time_threshold = datetime.now() + timedelta(hours=30)
-        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id,confirmacao=0,data_hora_saida__gte = time_threshold,  tipo_recurso="laboratorio")
+        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id,confirmacao=0,data_hora_saida__gte = time_threshold,  tipo_recurso="laboratorio", situacao =2)
         
         # And so on for more models
         return context
@@ -716,7 +718,7 @@ class ReservaLaboratorioCreateView(PermissionRequiredMixin, LoginRequiredMixin, 
         context = super(ReservaLaboratorioCreateView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
         context['recursos'] = Recurso.objetos.filter(tipo_recurso="laboratorio")
-        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio", data_hora_saida__gte = datetime.now())
         
         # And so on for more models
         return context
@@ -825,7 +827,7 @@ class ReservaLaboratorioCreateView(PermissionRequiredMixin, LoginRequiredMixin, 
                 print("----------------------------------------------------")
                 print("USURIO =" + str(usuario.id))
                 Reserva.objetos.create(id_usuario=usuario,id_recurso=id_recurso,situacao=situacao, data_hora_saida=dt1, data_hora_chegada=dt2, justificativa=justificativa, tipo_recurso="laboratorio", confirmacao=False, disciplina=disciplina, nome_professor= usuario.nome )
-            
+                messages.success(self.request, 'A reserva criada com sucesso')
             
         
         
@@ -847,7 +849,7 @@ class ReservaLaboratorioUsuariosCreateView(PermissionRequiredMixin, LoginRequire
         context = super(ReservaLaboratorioUsuariosCreateView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
         context['recursos'] = Recurso.objetos.filter(tipo_recurso="laboratorio")
-        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio", data_hora_saida__gte = datetime.now())
         
         # And so on for more models
         return context
@@ -967,7 +969,29 @@ class ReservaLaboratorioUsuariosCreateView(PermissionRequiredMixin, LoginRequire
         #return render(self.request, self.template_name, { 'form': form })
         return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio_usuarios'))
    
+class ReservaLaboratorioConfirmaUpdateView(PermissionRequiredMixin, LoginRequiredMixin,DeleteView):
+    permission_required = "authweb.change_reserva"
+    template_name = "website/reserva_laboratorio/confirma.html"
+    model = Reserva
+    #fields = '__all__'
+    context_object_name = 'reserva'
+    success_url = reverse_lazy("website:lista_reserva_laboratorios_nao_confirmada_usuario")
+    login_url = 'website:login'
+    redirect_field_name = 'redirect_to'
     
+    def delete(self, request, *args, **kwargs):
+        print("****************************************************")
+        print("FORM RESERVA LABORATORIO CONFIRMA VIEW")
+        print("****************************************************")
+        print("----------------------------------------------------")        
+        id = self.kwargs['pk']
+        print("ID RESERVA = " + str(id))
+        
+        print("----------------------------------------------------")
+        print("Confirmando reserva")
+        Reserva.objetos.filter(id=id).update(confirmacao=True)
+        messages.success(self.request, 'A reserva confirmada com sucesso!')
+        return HttpResponseRedirect(reverse('website:lista_reserva_laboratorios_nao_confirmada_usuario'))
    
     
     
@@ -975,11 +999,133 @@ class ReservaLaboratorioUpdateView(PermissionRequiredMixin, LoginRequiredMixin,U
     permission_required = "authweb.change_reserva"
     template_name = "website/reserva_laboratorio/atualiza.html"
     model = Reserva
-    fields = '__all__'
     context_object_name = 'reserva'
-    success_url = reverse_lazy("website:lista_foos")
+    form_class = InsereReservaLaboratorioForm    
     login_url = 'website:login'
     redirect_field_name = 'redirect_to'
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super(ReservaLaboratorioUpdateView, self).get_context_data(**kwargs)
+        #context['recursos'] = Recurso.objects.all()
+        context['recursos'] = Recurso.objetos.filter(tipo_recurso="laboratorio")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio",data_hora_saida__gte = datetime.now())
+        
+        # And so on for more models
+        return context
+    
+    def form_valid(self, form):
+        print("****************************************************")
+        print("FORM RESERVA LABORATORIO VIEW")
+        print("****************************************************")
+        id_recurso = form.cleaned_data['id_recurso']
+        print("----------------------------------------------------")
+        print(str(id_recurso))
+        print("----------------------------------------------------")
+        data_uso = form.cleaned_data['data_uso']
+        print("----------------------------------------------------")
+        print(str(data_uso))
+        time_uso = form.cleaned_data['time_uso']
+        print("----------------------------------------------------")
+        print(str(time_uso))
+        data_liberacao = form.cleaned_data['data_liberacao']
+        print("----------------------------------------------------")
+        print(str(data_liberacao))
+        time_liberacao = form.cleaned_data['time_liberacao']
+        print("----------------------------------------------------")
+        print(str(time_liberacao))
+        justificativa = form.cleaned_data['justificativa']
+        print("----------------------------------------------------")
+        print(str(justificativa))
+        disciplina = form.cleaned_data['disciplina']
+        print("----------------------------------------------------")
+        print(str(disciplina))
+        
+        
+        dow1 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 1);
+        dow2 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 59);
+        dow3 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 1);
+        
+        
+        dow4 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 59);
+        dow5 = datetime(data_uso.year,data_uso.month, data_uso.day, 22, 1);
+        dow6 = datetime(data_uso.year,data_uso.month, data_uso.day+1, 6, 59);
+        
+        
+        dt1 = datetime(data_uso.year,data_uso.month, data_uso.day, time_uso.hour, time_uso.minute)
+        print("----------------------------------------------------")
+        print("DATA INICIAL = " + str(dt1))
+        dt2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, time_liberacao.hour, time_liberacao.minute )
+        print("----------------------------------------------------")
+        print("DATA FINAL = " + str(dt2))
+        if  dt1 < datetime.now() or dt2 < datetime.now():
+            print("----------------------------------------------------")
+            print("data menor que o tempo atual")
+            messages.error(self.request, "data menor que o tempo atual")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+        
+        if dt1 >=  dt2 :
+           print("----------------------------------------------------")
+           print("data liberaraco e menor ou igual que a data de uso")
+           messages.error(self.request, "data liberaraco e menor ou igual que a data de uso")
+           return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+           
+        if ( (dow1 <= dt1 and dt1 <= dow2 ) or (dow3 <= dt1 and dt1 <= dow4 ) or (dow5 <= dt1 and dt1 <= dow6 )):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data de inicio")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+        
+        dow1 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 1);
+        dow2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow1) + " | " +  str(dt2) + " | " + str(dow2) + "]" )
+        dow3 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 1);
+        dow4 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow3) + " | " +  str(dt2) + " | " + str(dow4) + "]" )
+        dow5 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 22, 1);
+        dow6 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day+1, 6, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow5) + " | " +  str(dt2) + " | " + str(dow6) + "]" )
+        
+        
+        if ( (dow1 <= dt2 and dt2 <= dow2 ) or 
+             (dow3 <= dt2 and dt2 <= dow4 ) or
+             (dow5 <= dt2 and dt2 <= dow6 )
+             ):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data final")
+            messages.error(self.request, 'Fora de funcionamento para data final')
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+            
+        #reserva = Reserva.objetos.filter(Q(id_recurso=id_recurso) & (Q(data_hora_saida__lte = dt1) | Q(data_hora_saida__lte = dt1))).first()
+        reserva = Reserva.objetos.filter(id_recurso=id_recurso, data_hora_saida__lte = dt1 , data_hora_saida__gte = dt1, data_hora_chegada__lte = dt2 , data_hora_chegada__gte = dt2, tipo_recurso="laboratorio"  ).first()
+        
+        if (reserva != None):
+            print("A reserva nao pode ser realizada, ja existe uma reserava para esse recurso")
+            print("----------------------------------------------------")
+            print("RESERVA_ID =" + str(reserva.id))
+            messages.error(self.request, 'A reserva nao pode ser realizada, ja existe uma reserava para esse recurso')
+        else:
+            print("----------------------------------------------------")
+            print("Cadastrando Reserva...")
+            situacao = Situacao.objetos.filter(nome="Reservado").first()
+            usuario = Usuario.objetos.filter(matricula=self.request.user.username).first()
+            
+            if situacao != None:
+                print("----------------------------------------------------")
+                print("SITUACAO =" + str(situacao.nome))
+                print("----------------------------------------------------")
+                print("USURIO =" + str(usuario.id))
+                Reserva.objetos.filter(id_usuario=usuario).update(id_recurso=id_recurso,situacao=situacao, data_hora_saida=dt1, data_hora_chegada=dt2, justificativa=justificativa, tipo_recurso="laboratorio", confirmacao=False, disciplina=disciplina, nome_professor= usuario.nome )
+                messages.success(self.request, 'A reserva autualizada com sucesso!')
+            
+        
+        
+        #return redirect('reserva_laboratorio/cadastrar')
+        #return render(self.request, self.template_name, { 'form': form })
+        return HttpResponseRedirect(reverse('website:atualiza_reserva_laboratorio'))
+    
     
     
 
@@ -992,7 +1138,136 @@ class ReservaLaboratorioDeleteView(PermissionRequiredMixin,LoginRequiredMixin, D
     login_url = 'website:login'
     redirect_field_name = 'redirect_to'
     
+class ReservaLaboratorioUsuariosUpdateView(PermissionRequiredMixin, LoginRequiredMixin,UpdateView):
+    permission_required = "authweb.change_reserva"
+    template_name = "website/reserva_laboratorio/atualiza2.html"
+    model = Reserva
+    context_object_name = 'reserva'
+    form_class = InsereReservaLaboratorioUsuariosForm    
+    login_url = 'website:login'
+    redirect_field_name = 'redirect_to'
     
+    
+    def get_context_data(self, **kwargs):
+        context = super(ReservaLaboratorioUsuariosUpdateView, self).get_context_data(**kwargs)
+        #context['recursos'] = Recurso.objects.all()
+        context['recursos'] = Recurso.objetos.filter(tipo_recurso="laboratorio")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="laboratorio", data_hora_saida__gte = datetime.now())
+        
+        # And so on for more models
+        return context
+    
+    def form_valid(self, form):
+        print("****************************************************")
+        print("FORM RESERVA LABORATORIO VIEW")
+        print("****************************************************")
+        id_recurso = form.cleaned_data['id_recurso']
+        print("----------------------------------------------------")
+        print(str(id_recurso))
+        print("----------------------------------------------------")
+        data_uso = form.cleaned_data['data_uso']
+        print("----------------------------------------------------")
+        print(str(data_uso))
+        time_uso = form.cleaned_data['time_uso']
+        print("----------------------------------------------------")
+        print(str(time_uso))
+        data_liberacao = form.cleaned_data['data_liberacao']
+        print("----------------------------------------------------")
+        print(str(data_liberacao))
+        time_liberacao = form.cleaned_data['time_liberacao']
+        print("----------------------------------------------------")
+        print(str(time_liberacao))
+        justificativa = form.cleaned_data['justificativa']
+        print("----------------------------------------------------")
+        print(str(justificativa))
+        disciplina = form.cleaned_data['disciplina']
+        print("----------------------------------------------------")
+        print(str(disciplina))
+        
+        
+        dow1 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 1);
+        dow2 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 59);
+        dow3 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 1);
+        
+        
+        dow4 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 59);
+        dow5 = datetime(data_uso.year,data_uso.month, data_uso.day, 22, 1);
+        dow6 = datetime(data_uso.year,data_uso.month, data_uso.day+1, 6, 59);
+        
+        
+        dt1 = datetime(data_uso.year,data_uso.month, data_uso.day, time_uso.hour, time_uso.minute)
+        print("----------------------------------------------------")
+        print("DATA INICIAL = " + str(dt1))
+        dt2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, time_liberacao.hour, time_liberacao.minute )
+        print("----------------------------------------------------")
+        print("DATA FINAL = " + str(dt2))
+        if  dt1 < datetime.now() or dt2 < datetime.now():
+            print("----------------------------------------------------")
+            print("data menor que o tempo atual")
+            messages.error(self.request, "data menor que o tempo atual")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+        
+        if dt1 >=  dt2 :
+           print("----------------------------------------------------")
+           print("data liberaraco e menor ou igual que a data de uso")
+           messages.error(self.request, "data liberaraco e menor ou igual que a data de uso")
+           return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+           
+        if ( (dow1 <= dt1 and dt1 <= dow2 ) or (dow3 <= dt1 and dt1 <= dow4 ) or (dow5 <= dt1 and dt1 <= dow6 )):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data de inicio")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+        
+        dow1 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 1);
+        dow2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow1) + " | " +  str(dt2) + " | " + str(dow2) + "]" )
+        dow3 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 1);
+        dow4 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow3) + " | " +  str(dt2) + " | " + str(dow4) + "]" )
+        dow5 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 22, 1);
+        dow6 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day+1, 6, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow5) + " | " +  str(dt2) + " | " + str(dow6) + "]" )
+        
+        
+        if ( (dow1 <= dt2 and dt2 <= dow2 ) or 
+             (dow3 <= dt2 and dt2 <= dow4 ) or
+             (dow5 <= dt2 and dt2 <= dow6 )
+             ):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data final")
+            messages.error(self.request, 'Fora de funcionamento para data final')
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_laboratorio'))
+            
+        #reserva = Reserva.objetos.filter(Q(id_recurso=id_recurso) & (Q(data_hora_saida__lte = dt1) | Q(data_hora_saida__lte = dt1))).first()
+        reserva = Reserva.objetos.filter(id_recurso=id_recurso, data_hora_saida__lte = dt1 , data_hora_saida__gte = dt1, data_hora_chegada__lte = dt2 , data_hora_chegada__gte = dt2, tipo_recurso="laboratorio"  ).first()
+        
+        if (reserva != None):
+            print("A reserva nao pode ser realizada, ja existe uma reserava para esse recurso")
+            print("----------------------------------------------------")
+            print("RESERVA_ID =" + str(reserva.id))
+            messages.error(self.request, 'A reserva nao pode ser realizada, ja existe uma reserava para esse recurso')
+        else:
+            print("----------------------------------------------------")
+            print("Cadastrando Reserva...")
+            situacao = Situacao.objetos.filter(nome="Reservado").first()
+            usuario = Usuario.objetos.filter(matricula=self.request.user.username).first()
+            
+            if situacao != None:
+                print("----------------------------------------------------")
+                print("SITUACAO =" + str(situacao.nome))
+                print("----------------------------------------------------")
+                print("USURIO =" + str(usuario.id))
+                Reserva.objetos.filter(id_usuario=usuario).update(id_recurso=id_recurso,situacao=situacao, data_hora_saida=dt1, data_hora_chegada=dt2, justificativa=justificativa, tipo_recurso="laboratorio", confirmacao=False, disciplina=disciplina, nome_professor= usuario.nome )
+                messages.success(self.request, 'A reserva autualizada com sucesso!')
+            
+        
+        
+        #return redirect('reserva_laboratorio/cadastrar')
+        #return render(self.request, self.template_name, { 'form': form })
+        return HttpResponseRedirect(reverse('website:atualiza_reserva_laboratorio_usuarios'))
 class ReservaProjetorListView(PermissionRequiredMixin,LoginRequiredMixin, ListView):
     permission_required = "authweb.view_reserva"
     template_name = "website/reserva_projetor/lista.html"
@@ -1004,7 +1279,7 @@ class ReservaProjetorListView(PermissionRequiredMixin,LoginRequiredMixin, ListVi
     def get_context_data(self, **kwargs):
         context = super(ReservaProjetorListView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
-        context['reservas'] = Reserva.objetos.filter(tipo_recurso="projetor")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="projetor",data_hora_saida__gte = datetime.now())
         
         # And so on for more models
         return context
@@ -1019,7 +1294,7 @@ class ReservaProjetorUsuarioListView(PermissionRequiredMixin,LoginRequiredMixin,
     def get_context_data(self, **kwargs):
         context = super(ReservaProjetorUsuarioListView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
-        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id, tipo_recurso="projetor")
+        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id, tipo_recurso="projetor", data_hora_saida__gte = datetime.now(), situacao =2)
         
         # And so on for more models
         return context
@@ -1035,7 +1310,7 @@ class ReservaNaoConfirmadaProjetorUsuarioListView(PermissionRequiredMixin,LoginR
         context = super(ReservaNaoConfirmadaProjetorUsuarioListView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
         time_threshold = datetime.now() + timedelta(hours=30)
-        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id,confirmacao=0,data_hora_saida__gte = time_threshold, tipo_recurso="projetor")
+        context['reservas'] = Reserva.objetos.filter(id_usuario=self.request.user.id,confirmacao=0,data_hora_saida__gte = time_threshold, tipo_recurso="projetor", situacao =2)
         
         # And so on for more models
         return context
@@ -1189,7 +1464,7 @@ class ReservaProjetorUsuariosCreateView(PermissionRequiredMixin, LoginRequiredMi
         context = super(ReservaProjetorUsuariosCreateView, self).get_context_data(**kwargs)
         #context['recursos'] = Recurso.objects.all()
         context['recursos'] = Recurso.objetos.filter(tipo_recurso="projetor")
-        context['reservas'] = Reserva.objetos.filter(tipo_recurso="projetor")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="projetor",data_hora_saida__gte = datetime.now())
         
         # And so on for more models
         return context
@@ -1304,7 +1579,7 @@ class ReservaProjetorUsuariosCreateView(PermissionRequiredMixin, LoginRequiredMi
                 print("----------------------------------------------------")
                 print("USURIO =" + str(id_usuario))
                 Reserva.objetos.create(id_usuario=id_usuario,id_recurso=id_recurso,situacao=situacao, data_hora_saida=dt1, data_hora_chegada=dt2, curso = curso, tipo_recurso="projetor", confirmacao=False, primeira_aula = primeira_aula, segunda_aula = segunda_aula)
-                messages.success(self.request, 'Reserava do Projetor Realizada com Sucesso')
+                messages.success(self.request, 'Reserva do Projetor Realizada com Sucesso')
             
         
         
@@ -1313,6 +1588,29 @@ class ReservaProjetorUsuariosCreateView(PermissionRequiredMixin, LoginRequiredMi
         return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor_usuarios'))
 
     
+class ReservaProjetorConfirmaUpdateView(PermissionRequiredMixin, LoginRequiredMixin,DeleteView):
+    permission_required = "authweb.change_reserva"
+    template_name = "website/reserva_projetor/confirma.html"
+    model = Reserva
+    #fields = '__all__'
+    context_object_name = 'reserva'
+    success_url = reverse_lazy("website:lista_reserva_projetors_nao_confirmada_usuario")
+    login_url = 'website:login'
+    redirect_field_name = 'redirect_to'
+    
+    def delete(self, request, *args, **kwargs):
+        print("****************************************************")
+        print("FORM RESERVA PROJETOR CONFIRMA VIEW")
+        print("****************************************************")
+        print("----------------------------------------------------")        
+        id = self.kwargs['pk']
+        print("ID RESERVA = " + str(id))
+        
+        print("----------------------------------------------------")
+        print("Confirmando reserva")
+        Reserva.objetos.filter(id=id).update(confirmacao=True)
+        messages.success(self.request, 'A Reserva Confirmada com Sucesso!')
+        return HttpResponseRedirect(reverse('website:lista_reserva_projetors_nao_confirmada_usuario'))
    
     
    
@@ -1322,12 +1620,269 @@ class ReservaProjetorUpdateView(PermissionRequiredMixin, LoginRequiredMixin,Upda
     permission_required = "authweb.change_reserva"
     template_name = "website/reserva_projetor/atualiza.html"
     model = Reserva
-    fields = '__all__'
+    form_class = InsereReservaProjetorForm
     context_object_name = 'reserva'
-    success_url = reverse_lazy("website:lista_foos")
     login_url = 'website:login'
     redirect_field_name = 'redirect_to'
     
+    def get_context_data(self, **kwargs):
+        context = super(ReservaProjetorCreateView, self).get_context_data(**kwargs)
+        #context['recursos'] = Recurso.objects.all()
+        context['recursos'] = Recurso.objetos.filter(tipo_recurso="projetor")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="projetor", data_hora_saida__gte = datetime.now())
+        
+        # And so on for more models
+        return context
+    
+    def form_valid(self, form):
+        print("****************************************************")
+        print("FORM RESERVA LABORATORIO VIEW")
+        print("****************************************************")
+        id_recurso = form.cleaned_data['id_recurso']
+        print("----------------------------------------------------")
+        print(str(id_recurso))
+        print("----------------------------------------------------")
+        data_uso = form.cleaned_data['data_uso']
+        print("----------------------------------------------------")
+        print(str(data_uso))
+        time_uso = form.cleaned_data['time_uso']
+        print("----------------------------------------------------")
+        print(str(time_uso))
+        data_liberacao = form.cleaned_data['data_liberacao']
+        print("----------------------------------------------------")
+        print(str(data_liberacao))
+        time_liberacao = form.cleaned_data['time_liberacao']
+        print("----------------------------------------------------")
+        print(str(time_liberacao))
+        curso = form.cleaned_data['curso']
+        print("----------------------------------------------------")
+        print(str(curso))
+        primeira_aula = form.cleaned_data['primeira_aula']
+        print("----------------------------------------------------")
+        print(str(primeira_aula))
+        segunda_aula = form.cleaned_data['segunda_aula']
+        print("----------------------------------------------------")
+        print(str(segunda_aula))
+        
+        
+        dow1 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 1);
+        dow2 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 59);
+        dow3 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 1);
+        
+        
+        dow4 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 59);
+        dow5 = datetime(data_uso.year,data_uso.month, data_uso.day, 22, 1);
+        dow6 = datetime(data_uso.year,data_uso.month, data_uso.day+1, 6, 59);
+        
+        
+        dt1 = datetime(data_uso.year,data_uso.month, data_uso.day, time_uso.hour, time_uso.minute)
+        print("----------------------------------------------------")
+        print("DATA INICIAL = " + str(dt1))
+        dt2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, time_liberacao.hour, time_liberacao.minute )
+        print("----------------------------------------------------")
+        print("DATA FINAL = " + str(dt2))
+        if  dt1 < datetime.now() or dt2 < datetime.now():
+            print("----------------------------------------------------")
+            print("data menor que o tempo atual")
+            messages.error(self.request, "data menor que o tempo atual")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+        
+        if dt1 >=  dt2 :
+           print("----------------------------------------------------")
+           print("data liberaraco e menor ou igual que a data de uso")
+           messages.error(self.request, "data liberaraco e menor ou igual que a data de uso")
+           return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+           
+        if ( (dow1 <= dt1 and dt1 <= dow2 ) or (dow3 <= dt1 and dt1 <= dow4 ) or (dow5 <= dt1 and dt1 <= dow6 )):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data de inicio")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+        
+        dow1 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 1);
+        dow2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow1) + " | " +  str(dt2) + " | " + str(dow2) + "]" )
+        dow3 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 1);
+        dow4 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow3) + " | " +  str(dt2) + " | " + str(dow4) + "]" )
+        dow5 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 22, 1);
+        dow6 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day+1, 6, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow5) + " | " +  str(dt2) + " | " + str(dow6) + "]" )
+        
+        
+        if ( (dow1 <= dt2 and dt2 <= dow2 ) or 
+             (dow3 <= dt2 and dt2 <= dow4 ) or
+             (dow5 <= dt2 and dt2 <= dow6 )
+             ):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data final")
+            messages.error(self.request, 'Fora de funcionamento para data final')
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+            
+        #reserva = Reserva.objetos.filter(Q(id_recurso=id_recurso) & (Q(data_hora_saida__lte = dt1) | Q(data_hora_saida__lte = dt1))).first()
+        reserva = Reserva.objetos.filter(id_recurso=id_recurso, data_hora_saida__lte = dt1 , data_hora_saida__gte = dt1, data_hora_chegada__lte = dt2 , data_hora_chegada__gte = dt2,  tipo_recurso="projetor"  ).first()
+        
+        if (reserva != None):
+            print("A reserva nao pode ser realizada, ja existe uma reserava para esse recurso")
+            print("----------------------------------------------------")
+            print("RESERVA_ID =" + str(reserva.id))
+            messages.error(self.request, 'A reserva nao pode ser realizada, ja existe uma reserava para esse recurso')
+        else:
+            print("----------------------------------------------------")
+            print("Cadastrando Reserva...")
+            situacao = Situacao.objetos.filter(nome="Reservado").first()
+            usuario = Usuario.objetos.filter(matricula=self.request.user.username).first()
+            
+            if situacao != None:
+                print("----------------------------------------------------")
+                print("SITUACAO =" + str(situacao.nome))
+                print("----------------------------------------------------")
+                print("USURIO =" + str(usuario.id))
+                Reserva.objetos.filter(id_usuario=usuario).update(id_recurso=id_recurso,situacao=situacao, data_hora_saida=dt1, data_hora_chegada=dt2, curso = curso, tipo_recurso="projetor", confirmacao=False, primeira_aula = primeira_aula, segunda_aula = segunda_aula)
+                messages.success(self.request, 'Reserava do Projetor Atualizada com Sucesso!!!')
+            
+        
+        
+        #return redirect('reserva_projetor/cadastrar')
+        #return render(self.request, self.template_name, { 'form': form })
+        return HttpResponseRedirect(reverse('website:atualiza_reserva_projetor'))
+
+    
+class ReservaProjetorUsuariosUpdateView(PermissionRequiredMixin, LoginRequiredMixin,UpdateView):
+    permission_required = "authweb.change_reserva"
+    template_name = "website/reserva_projetor/atualiza2.html"
+    model = Reserva
+    form_class = InsereReservaProjetorUsuariosForm
+    context_object_name = 'reserva'
+    login_url = 'website:login'
+    redirect_field_name = 'redirect_to'
+    
+    def get_context_data(self, **kwargs):
+        context = super(ReservaProjetorUsuariosUpdateView, self).get_context_data(**kwargs)
+        #context['recursos'] = Recurso.objects.all()
+        context['recursos'] = Recurso.objetos.filter(tipo_recurso="projetor")
+        context['reservas'] = Reserva.objetos.filter(tipo_recurso="projetor",data_hora_saida__gte = datetime.now())
+        
+        # And so on for more models
+        return context
+    
+    def form_valid(self, form):
+        print("****************************************************")
+        print("FORM RESERVA LABORATORIO VIEW")
+        print("****************************************************")
+        id_recurso = form.cleaned_data['id_recurso']
+        print("----------------------------------------------------")
+        print(str(id_recurso))
+        print("----------------------------------------------------")
+        data_uso = form.cleaned_data['data_uso']
+        print("----------------------------------------------------")
+        print(str(data_uso))
+        time_uso = form.cleaned_data['time_uso']
+        print("----------------------------------------------------")
+        print(str(time_uso))
+        data_liberacao = form.cleaned_data['data_liberacao']
+        print("----------------------------------------------------")
+        print(str(data_liberacao))
+        time_liberacao = form.cleaned_data['time_liberacao']
+        print("----------------------------------------------------")
+        print(str(time_liberacao))
+        curso = form.cleaned_data['curso']
+        print("----------------------------------------------------")
+        print(str(curso))
+        primeira_aula = form.cleaned_data['primeira_aula']
+        print("----------------------------------------------------")
+        print(str(primeira_aula))
+        segunda_aula = form.cleaned_data['segunda_aula']
+        print("----------------------------------------------------")
+        print(str(segunda_aula))
+        
+        
+        dow1 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 1);
+        dow2 = datetime(data_uso.year,data_uso.month, data_uso.day, 12, 59);
+        dow3 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 1);
+        
+        
+        dow4 = datetime(data_uso.year,data_uso.month, data_uso.day, 17, 59);
+        dow5 = datetime(data_uso.year,data_uso.month, data_uso.day, 22, 1);
+        dow6 = datetime(data_uso.year,data_uso.month, data_uso.day+1, 6, 59);
+        
+        
+        dt1 = datetime(data_uso.year,data_uso.month, data_uso.day, time_uso.hour, time_uso.minute)
+        print("----------------------------------------------------")
+        print("DATA INICIAL = " + str(dt1))
+        dt2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, time_liberacao.hour, time_liberacao.minute )
+        print("----------------------------------------------------")
+        print("DATA FINAL = " + str(dt2))
+        if  dt1 < datetime.now() or dt2 < datetime.now():
+            print("----------------------------------------------------")
+            print("data menor que o tempo atual")
+            messages.error(self.request, "data menor que o tempo atual")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+        
+        if dt1 >=  dt2 :
+           print("----------------------------------------------------")
+           print("data liberaraco e menor ou igual que a data de uso")
+           messages.error(self.request, "data liberaraco e menor ou igual que a data de uso")
+           return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+           
+        if ( (dow1 <= dt1 and dt1 <= dow2 ) or (dow3 <= dt1 and dt1 <= dow4 ) or (dow5 <= dt1 and dt1 <= dow6 )):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data de inicio")
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+        
+        dow1 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 1);
+        dow2 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 12, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow1) + " | " +  str(dt2) + " | " + str(dow2) + "]" )
+        dow3 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 1);
+        dow4 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 17, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow3) + " | " +  str(dt2) + " | " + str(dow4) + "]" )
+        dow5 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day, 22, 1);
+        dow6 = datetime(data_liberacao.year,data_liberacao.month, data_liberacao.day+1, 6, 59);
+        print("----------------------------------------------------")
+        print("[" + str(dow5) + " | " +  str(dt2) + " | " + str(dow6) + "]" )
+        
+        
+        if ( (dow1 <= dt2 and dt2 <= dow2 ) or 
+             (dow3 <= dt2 and dt2 <= dow4 ) or
+             (dow5 <= dt2 and dt2 <= dow6 )
+             ):
+            print("----------------------------------------------------")
+            print("Fora de funcionamento para data final")
+            messages.error(self.request, 'Fora de funcionamento para data final')
+            return HttpResponseRedirect(reverse('website:cadastra_reserva_projetor'))
+            
+        #reserva = Reserva.objetos.filter(Q(id_recurso=id_recurso) & (Q(data_hora_saida__lte = dt1) | Q(data_hora_saida__lte = dt1))).first()
+        reserva = Reserva.objetos.filter(id_recurso=id_recurso, data_hora_saida__lte = dt1 , data_hora_saida__gte = dt1, data_hora_chegada__lte = dt2 , data_hora_chegada__gte = dt2,  tipo_recurso="projetor"  ).first()
+        
+        if (reserva != None):
+            print("A reserva nao pode ser realizada, ja existe uma reserava para esse recurso")
+            print("----------------------------------------------------")
+            print("RESERVA_ID =" + str(reserva.id))
+            messages.error(self.request, 'A reserva nao pode ser realizada, ja existe uma reserava para esse recurso')
+        else:
+            print("----------------------------------------------------")
+            print("Cadastrando Reserva...")
+            situacao = Situacao.objetos.filter(nome="Reservado").first()
+            usuario = Usuario.objetos.filter(matricula=self.request.user.username).first()
+            
+            if situacao != None:
+                print("----------------------------------------------------")
+                print("SITUACAO =" + str(situacao.nome))
+                print("----------------------------------------------------")
+                print("USURIO =" + str(usuario.id))
+                Reserva.objetos.filter(id_usuario=usuario).update(id_recurso=id_recurso,situacao=situacao, data_hora_saida=dt1, data_hora_chegada=dt2, curso = curso, tipo_recurso="projetor", confirmacao=False, primeira_aula = primeira_aula, segunda_aula = segunda_aula)
+                messages.success(self.request, 'Reserava do Projetor Atualizada com Sucesso!!!')
+            
+        
+        
+        #return redirect('reserva_projetor/cadastrar')
+        #return render(self.request, self.template_name, { 'form': form })
+        return HttpResponseRedirect(reverse('website:atualiza_reserva_projetor_usuarios'))
+
     
 
 class ReservaProjetorDeleteView(PermissionRequiredMixin,LoginRequiredMixin, DeleteView):

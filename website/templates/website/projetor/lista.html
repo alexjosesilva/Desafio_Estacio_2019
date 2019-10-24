@@ -1,5 +1,9 @@
 {% extends "website/_layouts/base.html" %}
 
+{% load widget_tweaks %}
+
+{% load mytags %}
+
 {% block title %}Lista de Projetor{% endblock %}
 
 {% block conteudo %}
@@ -29,7 +33,7 @@
               {% for projetor in projetors %}
                 <tr>
                   <th scope="row">{{ projetor.numero }}</th>
-				  <th scope="row">{{ projetor.descricao }}</th>
+				  <th scope="row">{{ projetor.descricao|str_none }}</th>
         
 
                   <td class="text-center">

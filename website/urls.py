@@ -6,7 +6,9 @@ from website.views import IndexTemplateView, FooCreateView, FooListView,\
     ReservaProjetorUsuarioListView,\
     ReservaNaoConfirmadaProjetorUsuarioListView,\
     ReservaLaboratorioUsuariosCreateView, UsuarioListViewUsuario,\
-    UsuarioUpdateViewUsuario, ReservaProjetorUsuariosCreateView
+    UsuarioUpdateViewUsuario, ReservaProjetorUsuariosCreateView,\
+    ReservaLaboratorioUsuariosUpdateView, ReservaProjetorUsuariosUpdateView,\
+    ReservaLaboratorioConfirmaUpdateView, ReservaProjetorConfirmaUpdateView
 
 from website.views import UsuarioListView, UsuarioUpdateView, UsuarioCreateView, \
 UsuarioDeleteView
@@ -146,14 +148,14 @@ urlpatterns = [
     # GET/POST /projetors/excluir/{pk}
     path('projetor/excluir/<pk>',ProjetorDeleteView.as_view(), name="deleta_projetor"),
     
-    path('reserva_laboratorio/cadastrar', ReservaLaboratorioCreateView.as_view(), name="cadastra_reserva_laboratorio"),
-    
+    path('reserva_laboratorio/cadastrar', ReservaLaboratorioCreateView.as_view(), name="cadastra_reserva_laboratorio"),   
     path('reserva_laboratorio/<pk>', ReservaLaboratorioUpdateView.as_view(), name="atualiza_reserva_laboratorio"),
-
     
-    path('reserva_laboratorio_usuarios/cadastrar', ReservaLaboratorioUsuariosCreateView.as_view(), name="cadastra_reserva_laboratorio_usuarios"),
+    path('reserva_laboratorio_confirma/<pk>', ReservaLaboratorioConfirmaUpdateView.as_view(), name="atualiza_reserva_laboratorio_confirma"),
     
-    #path('reserva_laboratorio_usuarios/<pk>', ReservaLaboratorioUsuariosUpdateView.as_view(), name="atualiza_reserva_laboratorio_usuarios"),
+    
+    path('reserva_laboratorio_usuarios/cadastrar', ReservaLaboratorioUsuariosCreateView.as_view(), name="cadastra_reserva_laboratorio_usuarios"),    
+    path('reserva_laboratorio_usuarios/<pk>', ReservaLaboratorioUsuariosUpdateView.as_view(), name="atualiza_reserva_laboratorio_usuarios"),
 
     # GET /reserva_laboratorios
     path('reserva_laboratorios/', ReservaLaboratorioListView.as_view(), name="lista_reserva_laboratorios"),
@@ -170,23 +172,23 @@ urlpatterns = [
     path('reserva_laboratorio/excluir/<pk>', ReservaLaboratorioDeleteView.as_view(), name="deleta_reserva_laboratorio"),
     
     
-    path('reserva_projetor/cadastrar', ReservaProjetorCreateView.as_view(), name="cadastra_reserva_projetor"),
+    path('reserva_projetor/cadastrar', ReservaProjetorCreateView.as_view(), name="cadastra_reserva_projetor"),   
+    # POST /reserva_projetor/{pk}
+    path('reserva_projetor/<pk>', ReservaProjetorUpdateView.as_view(), name="atualiza_reserva_projetor"),
     
-     # GET/POST /reserva_laboratorio/{pk}
-    path('reserva_laboratorio/<pk>', ReservaLaboratorioUpdateView.as_view(), name="atualiza_reserva_laboratorio"),
+    path('reserva_projetor_confirma/<pk>', ReservaProjetorConfirmaUpdateView.as_view(), name="atualiza_reserva_projetor_confirma"),
     
-    path('reserva_projetor_usuarios/cadastrar', ReservaProjetorUsuariosCreateView.as_view(), name="cadastra_reserva_projetor_usuarios"),
-    # GET /reserva_projetors
+
+    path('reserva_projetor_usuarios/cadastrar', ReservaProjetorUsuariosCreateView.as_view(), name="cadastra_reserva_projetor_usuarios"),   
+    
+    path('reserva_projetor_usuarios/<pk>', ReservaProjetorUsuariosUpdateView.as_view(), name="atualiza_reserva_projetor_usuarios"),
+   
+    # POST /reserva_projetors
     path('reserva_projetors/', ReservaProjetorListView.as_view(), name="lista_reserva_projetors"),
     
     path('reserva_projetors_usuario/', ReservaProjetorUsuarioListView.as_view(), name="lista_reserva_projetors_usuario"),
     
     path('reserva_projetors_nao_confirmada_usuario/', ReservaNaoConfirmadaProjetorUsuarioListView.as_view(), name="lista_reserva_projetors_nao_confirmada_usuario"),
-    
-    
-
-    # GET/POST /reserva_projetor/{pk}
-    path('reserva_projetor/<pk>', ReservaProjetorUpdateView.as_view(), name="atualiza_reserva_projetor"),
 
     # GET/POST /reserva_projetors/excluir/{pk}
     path('reserva_projetor/excluir/<pk>', ReservaProjetorDeleteView.as_view(), name="deleta_reserva_projetor"),

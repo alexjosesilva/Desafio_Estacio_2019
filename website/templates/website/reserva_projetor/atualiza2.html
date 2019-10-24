@@ -289,10 +289,19 @@
             <!-- Não se esqueça dessa tag -->
             {% csrf_token %}
 
+
+
+			<div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Professor</span>
+              </div>
+              {% render_field  form.id_usuario class+="form-control" %}
+            </div>
+
             <!-- Nome -->
             <div class="input-group mb-3">
               <div class="input-group-prepend">
-                <span class="input-group-text">Nome</span>
+                <span class="input-group-text">Numero</span>
               </div>
               {% render_field  form.id_recurso  class+="form-control" %}
             </div>

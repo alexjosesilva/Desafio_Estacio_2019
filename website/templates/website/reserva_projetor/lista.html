@@ -1,6 +1,9 @@
 {% extends "website/_layouts/base.html" %}
 
+{% load widget_tweaks %}
+
 {% load mytags %}
+
 
 {% block title %}Lista de Reserva Projetor{% endblock %}
 
@@ -41,16 +44,16 @@
 				  <td scope="row">{{ reserva.data_hora_saida|date:'d/m/Y' }}-{{ reserva.data_hora_saida|time:"H:i" }}</td>
                   <td scope="row">{{ reserva.data_hora_chegada|date:'d/m/Y' }}-{{ reserva.data_hora_chegada|time:"H:i" }}</td>
 				  <td scope="row">{{ reserva.curso.nome }}</td>
-				  <td scope="row">{{ reserva.turno }}</td>
-				  <td scope="row">{{ reserva.primeira_aula}}</td>
-				  <td scope="row">{{ reserva.segunda_aula}}</td>
+				  <td scope="row">{{ reserva.turno|str_none }}</td>
+				  <td scope="row">{{ reserva.primeira_aula|str_aula}}</td>
+				  <td scope="row">{{ reserva.segunda_aula|str_aula}}</td>
 				  <td scope="row">{{ reserva.situacao.nome}}</td>
 				  <td scope="row">{{ reserva.confirmacao|str_confirmacao}}</td>
 				  	
 
                   <td class="text-center">
 				{% if perms.authweb.change_reserva %}
-                    <a href="{% url 'website:atualiza_reserva_projetor' pk=reserva.id %}"
+                    <a href="{% url 'website:atualiza_reserva_projetor_usuarios' pk=reserva.id %}"
                        class="btn btn-primary">
                       Atualizar
                     </a>

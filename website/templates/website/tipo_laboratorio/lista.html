@@ -1,5 +1,10 @@
 {% extends "website/_layouts/base.html" %}
 
+
+{% load widget_tweaks %}
+
+{% load mytags %}
+
 {% block title %}Lista de TipoLaboratorio{% endblock %}
 
 {% block conteudo %}
@@ -30,7 +35,7 @@
               {% for tipo_laboratorio in tipo_laboratorios %}
                 <tr>
                   <th scope="row">{{ tipo_laboratorio.nome }}</th>
-				 <th scope="row">{{ tipo_laboratorio.descricao }}</th>
+				 <th scope="row">{{ tipo_laboratorio.descricao|str_none }}</th>
         
 
                   <td class="text-center">
